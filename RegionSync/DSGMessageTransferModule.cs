@@ -716,5 +716,10 @@ namespace DSG.RegionSync
             return gim;
         }
 
+        public void HandleUndeliverableMessage(GridInstantMessage im, MessageResultNotification result)
+        {
+            // throw new NotImplementedException();
+            // Just ignore problem
+        }
     }
 }

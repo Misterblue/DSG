@@ -53,11 +53,11 @@ using OpenSim.Framework.Client;
 using OpenSim.Framework.Console;
 using OpenSim.Framework.Monitoring;
 using OpenSim.Region.CoreModules.Framework.InterfaceCommander;
-using Logging = OpenSim.Region.CoreModules.Framework.Statistics.Logging;
+using Logging = OpenSim.Framework;
 using OpenSim.Region.Framework.Interfaces;
 using OpenSim.Region.Framework.Scenes;
+using OpenSim.Region.PhysicsModules.SharedBase;
 using OpenSim.Region.Framework.Scenes.Serialization;
-using OpenSim.Region.Physics.Manager;
 using OpenSim.Services.Interfaces;
 using log4net;
 using System.Net;
@@ -1386,14 +1386,14 @@ namespace DSG.RegionSync
             int port;
             try
             {
-                addr = Scene.RegionInfo.GetOtherSetting("SyncServerAddress");
-                port = Int32.Parse(Scene.RegionInfo.GetOtherSetting("SyncServerPort"));
+                addr = Scene.RegionInfo.GetSetting("SyncServerAddress");
+                port = Int32.Parse(Scene.RegionInfo.GetSetting("SyncServerPort"));
             }
             catch (Exception e)
             {
                 m_log.Warn(LogHeader + " Could not read SyncServerAddress or SyncServerPort from region info. Using defaults.");
-                m_log.Warn(LogHeader + Scene.RegionInfo.GetOtherSetting("SyncServerAddress"));
-                m_log.Warn(LogHeader + Scene.RegionInfo.GetOtherSetting("SyncServerPort"));
+                m_log.Warn(LogHeader + Scene.RegionInfo.GetSetting("SyncServerAddress"));
+                m_log.Warn(LogHeader + Scene.RegionInfo.GetSetting("SyncServerPort"));
                 addr = "127.0.0.1";
                 port = 13000;
             }
@@ -1417,7 +1417,7 @@ namespace DSG.RegionSync
                     m_log.ErrorFormat("{0}: Failure registering endpoint", LogHeader);
                 }
                 if (!Scene.GridService.RegisterQuark(Scene.RegionInfo.RegionID.ToString(),
-                            Int32.Parse(Scene.RegionInfo.GetOtherSetting("SyncQuarkLocationX")), Int32.Parse(Scene.RegionInfo.GetOtherSetting("SyncQuarkLocationY"))))
+                            Int32.Parse(Scene.RegionInfo.GetSetting("SyncQuarkLocationX")), Int32.Parse(Scene.RegionInfo.GetSetting("SyncQuarkLocationY"))))
                 {
                     m_log.ErrorFormat("{0}: Failure registering quark", LogHeader);
                 }
@@ -1445,14 +1445,14 @@ namespace DSG.RegionSync
             int port;
             try
             {
-                addr = Scene.RegionInfo.GetOtherSetting("SyncServerAddress");
-                port = Int32.Parse(Scene.RegionInfo.GetOtherSetting("SyncServerPort"));
+                addr = Scene.RegionInfo.GetSetting("SyncServerAddress");
+                port = Int32.Parse(Scene.RegionInfo.GetSetting("SyncServerPort"));
             }
             catch (Exception e)
             {
                 m_log.Warn(LogHeader + " Could not read SyncServerAddress or SyncServerPort from region info. Using defaults.");
-                m_log.Warn(LogHeader + Scene.RegionInfo.GetOtherSetting("SyncServerAddress"));
-                m_log.Warn(LogHeader + Scene.RegionInfo.GetOtherSetting("SyncServerPort"));
+                m_log.Warn(LogHeader + Scene.RegionInfo.GetSetting("SyncServerAddress"));
+                m_log.Warn(LogHeader + Scene.RegionInfo.GetSetting("SyncServerPort"));
                 addr = "127.0.0.1";
                 port = 13000;
             }
@@ -1462,7 +1462,7 @@ namespace DSG.RegionSync
             {
                 /*
                 List<GridEndpointInfo> lgei = Scene.GridService.LookupQuark(
-                        Scene.RegionInfo.GetOtherSetting("SyncQuarkLocationX"), Scene.RegionInfo.GetOtherSetting("SyncQuarkLocationY"), "scene_persistence");
+                        Scene.RegionInfo.GetSetting("SyncQuarkLocationX"), Scene.RegionInfo.GetSetting("SyncQuarkLocationY"), "scene_persistence");
                 if (lgei == null || lgei.Count != 1)
                 {
                     m_log.ErrorFormat("{0}: Failed to find quark persistence actor", LogHeader);
@@ -1475,7 +1475,7 @@ namespace DSG.RegionSync
                     addr = gei.address;
                     port = (int)gei.port;
                     m_log.WarnFormat("{0}: Found quark ({1}/{2}) persistence actor at {3}:{4}", LogHeader,
-                            Scene.RegionInfo.GetOtherSetting("SyncQuarkLocationX"), Scene.RegionInfo.GetOtherSetting("SyncQuarkLocationY"),
+                            Scene.RegionInfo.GetSetting("SyncQuarkLocationX"), Scene.RegionInfo.GetSetting("SyncQuarkLocationY"),
                             addr, port.ToString());
                 }
                  * */

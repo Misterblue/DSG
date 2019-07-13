@@ -51,7 +51,7 @@ using log4net;
 using OpenMetaverse;
 using OpenMetaverse.StructuredData;
 using OpenSim.Region.Framework.Scenes;
-using OpenSim.Region.Framework.Scenes.Animation;
+using Animation = OpenSim.Region.Framework.Scenes.Animation;
 using OpenSim.Framework;
 using System.Diagnostics;
 
@@ -248,7 +248,7 @@ namespace DSG.RegionSync
                                 case SyncableProperties.Type.Animations:
                                     if (syncedProperty.LastUpdateValue != null)
                                     {
-                                        AnimationSet lastAnimations = new AnimationSet((OSDArray)syncedProperty.LastUpdateValue);
+                                        Animation.AnimationSet lastAnimations = new Animation.AnimationSet((OSDArray)syncedProperty.LastUpdateValue);
 
                                         // Get the home region for this presence (the client manager the presence is connected to).
                                         string cachedRealRegionName = (string)(CurrentlySyncedProperties[SyncableProperties.Type.RealRegion].LastUpdateValue);
@@ -345,7 +345,7 @@ namespace DSG.RegionSync
             // If we received a change in animations, need to send out the change.
 
             // Here is where we may need to force sending of updated properties, appearance, etc
-            sp.Updated = true;
+            sp.Update();
         }
 
         public override Object GetPropertyValue(SyncableProperties.Type property)
@@ -437,6 +437,7 @@ namespace DSG.RegionSync
             if (sp == null) 
                 return null;
 
+            EntityTransferContext ctx;
             switch (property)
             {
                 case SyncableProperties.Type.LocalId:
@@ -444,7 +445,8 @@ namespace DSG.RegionSync
                 case SyncableProperties.Type.AbsolutePosition:
                     return sp.AbsolutePosition;
                 case SyncableProperties.Type.AgentCircuitData:
-                    return Scene.AuthenticateHandler.GetAgentCircuitData(sp.ControllingClient.CircuitCode).PackAgentCircuitData();
+                    ctx = new EntityTransferContext();
+                    return Scene.AuthenticateHandler.GetAgentCircuitData(sp.ControllingClient.CircuitCode).PackAgentCircuitData(ctx);
                 case SyncableProperties.Type.ParentId:
                     return sp.ParentID;
                 case SyncableProperties.Type.AgentControlFlags:
@@ -454,7 +456,8 @@ namespace DSG.RegionSync
                 case SyncableProperties.Type.Animations:
                     return sp.Animator.Animations.ToOSDArray();
                 case SyncableProperties.Type.AvatarAppearance:
-                    return sp.Appearance.Pack();
+                    ctx = new EntityTransferContext();
+                    return sp.Appearance.Pack(ctx);
                 case SyncableProperties.Type.Rotation:
                     return sp.Rotation;
                 case SyncableProperties.Type.PA_Velocity:
@@ -593,8 +596,8 @@ namespace DSG.RegionSync
         //   effects happen and updates are sent out.
         private void UpdateAvatarAnimations(ScenePresence sp, OSDArray pPackedAnimations)
         {
-            AnimationSet newSet = new AnimationSet(pPackedAnimations);
-            AnimationSet currentSet = sp.Animator.Animations;
+            Animation.AnimationSet newSet = new Animation.AnimationSet(pPackedAnimations);
+            Animation.AnimationSet currentSet = sp.Animator.Animations;
             if (!newSet.Equals(currentSet))
             {
                 // DebugLog.DebugFormat("{0} UpdateAvatarAnimations. spID={1},CurrAnims={2},NewAnims={3}",
